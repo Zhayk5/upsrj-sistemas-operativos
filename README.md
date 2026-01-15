@@ -1,162 +1,199 @@
-# Simulación de Planificadores de CPU en C
+# Repositorio de Prácticas – Sistemas Operativos
 
-Este proyecto tiene como objetivo implementar y comparar tres algoritmos básicos de planificación de CPU:
+## Propósito del repositorio
 
-1. **First-Come, First-Served (FCFS)**
-2. **Shortest Job First (SJF)**
-3. **Round Robin (RR)**
+Este repositorio contiene las prácticas del curso de Sistemas Operativos.
+Cada práctica está diseñada para que el alumno:
 
-Estos algoritmos son fundamentales para comprender cómo los sistemas operativos asignan la CPU a distintos procesos.
-
----
-
-## Requisitos previos
-
-- Conocimientos básicos de C (estructuras, arreglos, funciones).
-- Familiaridad con conceptos de sistemas operativos:
-  - Proceso
-  - Tiempo de llegada (*arrival time*)
-  - Tiempo de ráfaga (*burst time*)
-  - Tiempo de espera (*waiting time*)
-  - Tiempo de retorno (*turnaround time*)
-- Compilador de C (gcc o equivalente).
+* Implemente funcionalidades en C y/o scripts en Linux
+* Valide su solución mediante unit testing
+* Entregue su trabajo usando GitHub y GitHub Actions
+* Experimente un flujo de trabajo similar al usado en la industria
 
 ---
 
-## Infraestructura
-
-El proyecto incluye una infraestructura común:
-
-- `process.h` y `process.c`: definición de la estructura `Process` y funciones auxiliares para:
-  - Leer procesos desde entrada estándar.
-  - Inicializar campos comunes.
-  - Imprimir resultados en tabla.
-
-Cada algoritmo se implementa en un archivo independiente:
-
-- `fcfs.c`
-- `sjf.c`
-- `rr.c`
-
-El alumno debe concentrarse únicamente en la **lógica del algoritmo de planificación**.
-
----
-
-## Algoritmos
-
-### 1. First-Come, First-Served (FCFS)
-
-- Los procesos se atienden en el orden en que llegan.
-- No hay interrupciones: un proceso se ejecuta hasta terminar.
-- Problema clásico: el *efecto convoy* (procesos cortos esperando a uno largo).
-
-**Diagrama de ejemplo:**
-
-Procesos:  
-- P1 (AT=0, BT=5)  
-- P2 (AT=1, BT=3)  
-- P3 (AT=2, BT=2)
+## Organización general del repositorio
 
 ```
-Tiempo: 0   1   2   3   4   5   6   7   8   9   10
-        |---P1---|---P2---|--P3--|
+.
+├── src/
+│   ├── schdl/          # Prácticas de scheduling (FCFS, RR, SJF, etc.)
+│   └── ...             # Otras prácticas futuras
+│
+├── test/
+│   ├── Makefile        # Compilación y ejecución de unit tests
+│   ├── test_*.c        # Unit tests asociados a las prácticas
+│
+├── .github/
+│   └── workflows/
+│       └── *.yml       # Workflows de GitHub Actions (CI)
+│
+└── README.md           # Este archivo
 ```
+
+Cada subdirectorio dentro de `src/` puede contener su propio `README.md` con instrucciones específicas de la práctica.
 
 ---
 
-### 2. Shortest Job First (SJF)
+## Flujo de trabajo esperado
 
-- Se selecciona el proceso con menor tiempo de ráfaga entre los disponibles.
-- Minimiza el tiempo promedio de espera.
-- Riesgo: *starvation* (procesos largos pueden quedar esperando indefinidamente).
+### 1. Sincronizar tu fork con el tag del profesor
 
-**Diagrama de ejemplo:**
+Para cada práctica, el profesor indicará un **tag específico** que debes usar como base:
 
-Procesos:  
-- P1 (AT=0, BT=7)  
-- P2 (AT=2, BT=4)  
-- P3 (AT=4, BT=1)
-
-```
-Tiempo: 0   1   2   3   4   5   6   7   8   9   10  11  12
-        |-------P1-------|----P2----|--P3--|
-```
-
-En este caso, cuando P2 y P3 llegan, se elige el de menor ráfaga.
-
----
-
-### 3. Round Robin (RR)
-
-- Cada proceso recibe un **quantum** fijo de CPU.
-- Si no termina en ese quantum, se coloca al final de la cola.
-- Garantiza equidad, especialmente en sistemas interactivos.
-
-**Diagrama de ejemplo (quantum=2):**
-
-Procesos:  
-- P1 (AT=0, BT=5)  
-- P2 (AT=1, BT=3)  
-- P3 (AT=2, BT=4)
-
-```
-Tiempo: 0   2   4   6   8   10   12   13
-        |P1|P2|P3|P1|P2|P3|P1|
-```
-
-Cada proceso recibe 2 unidades de tiempo en cada turno, hasta completar su ráfaga.
-
----
-
-## Pasos sugeridos para la implementación
-
-1. **Definir la estructura de datos**  
-   Usar `Process` de `process.h`.
-
-2. **Leer procesos**  
-   Con `read_processes()`.
-
-3. **Inicializar campos**  
-   Con `init_processes()`.
-
-4. **Implementar la lógica del scheduler**  
-   - FCFS: recorrer procesos en orden de llegada.  
-   - SJF: seleccionar el proceso con menor ráfaga disponible.  
-   - RR: simular cola circular con quantum fijo.
-
-5. **Calcular métricas**  
-   - `waiting_time` = tiempo de inicio - tiempo de llegada.  
-   - `turnaround_time` = `waiting_time + burst_time`.
-
-6. **Imprimir resultados**  
-   Con `print_results()`.
-
----
-
-## Ejecución
-
-Compilar con:
+1. Clona tu fork (si no lo has hecho):
 
 ```bash
-gcc fcfs.c process.c -o fcfs
-gcc sjf.c process.c -o sjf
-gcc rr.c process.c -o rr
+git clone <tu-fork-url>
+cd <nombre-del-repo>
 ```
 
-Ejecutar:
+2. Agrega el repositorio del profesor como remoto (solo si no lo tienes aún):
 
 ```bash
-./fcfs
-./sjf
-./rr
+git remote add os-base <repo-del-profesor-os-base>
 ```
+
+3. Trae el tag correspondiente:
+
+```bash
+git fetch os-base tag <TAG_DE_LA_PRACTICA>
+```
+
+4. Haz checkout de ese tag en tu branch local de trabajo:
+
+```bash
+git checkout -b practica-X FETCH_HEAD
+```
+
+5. Mergea los contenidos del tag con tus cambios actuales (si los hay):
+
+```bash
+git merge practica-X
+```
+
+> Esto asegura que siempre trabajas sobre la **base correcta** indicada para la práctica.
 
 ---
 
-## Objetivo didáctico
+### 2. Leer las instrucciones de la práctica
 
-Este proyecto permite comprender cómo distintos algoritmos afectan:
+* Cada práctica tiene un `README.md` dentro de su carpeta correspondiente en `src/`
+* Lee cuidadosamente los objetivos y restricciones
+* Respeta qué archivos se pueden modificar y cuáles no
 
-- El tiempo de espera promedio.
-- El tiempo de retorno promedio.
-- La equidad entre procesos.
+---
+
+### 3. Implementar la solución
+
+* Trabaja únicamente en los archivos indicados para el alumno
+* No modifiques:
+
+  * Infraestructura común (`process.h`, `process.c`)
+  * Unit tests
+  * Workflows de GitHub Actions
+* Sigue buenas prácticas de programación en C y Linux
+
+---
+
+### 4. Validar localmente con unit tests
+
+Antes de hacer cualquier commit, valida tu solución localmente:
+
+```bash
+cd test
+make clean
+make
+make run
+```
+
+* Todos los tests deben pasar
+* Si algún test falla, corrígelo antes de continuar
+
+---
+
+### 5. Commit y push a GitHub
+
+Una vez que los tests pasen localmente:
+
+```bash
+git add .
+git commit -m "Entrega práctica X"
+git push
+```
+
+Puedes trabajar en cualquier branch.
+
+---
+
+### 6. Activar y validar GitHub Actions
+
+1. Si es la primera vez en tu fork, asegúrate de **activar GitHub Actions** en tu repositorio.
+2. Después del push:
+
+   * Ve a la pestaña **Actions**
+   * Revisa el workflow correspondiente
+3. El resultado esperado:
+
+```
+✔ Workflow completed successfully
+```
+
+Si el workflow falla, la práctica no se considera aprobada.
+
+---
+
+## Evaluación automática (CI)
+
+* Cada commit dispara automáticamente el workflow
+* El código se compila en Ubuntu 22.04
+* Se ejecutan los unit tests oficiales
+* Un solo test fallido implica entrega fallida
+
+Esto garantiza:
+
+* Evaluación justa
+* Resultados reproducibles
+* Condiciones iguales para todos los alumnos
+
+---
+
+## Reglas importantes
+
+* No modifiques los unit tests
+* No modifiques los workflows
+* No elimines asserts o validaciones
+* No fuerces resultados para pasar el test
+* Implementa los algoritmos correctamente
+
+---
+
+## Recomendaciones
+
+* Trabaja en branches
+* Haz commits pequeños y descriptivos
+* Lee los mensajes de error de los tests
+* Usa `assert` como herramienta de aprendizaje
+* Pregunta si algo no queda claro
+
+---
+
+## Criterio de aprobación
+
+Una práctica se considera aprobada cuando:
+
+* Compila sin warnings
+* Pasa todos los unit tests localmente
+* El workflow de GitHub Actions termina exitosamente
+* El commit correspondiente queda registrado
+
+---
+
+## Nota final
+
+Este flujo de trabajo refleja prácticas reales de desarrollo profesional:
+
+* Integración continua (CI)
+* Validación automática
+* Control de versiones
+* Trabajo reproducible
