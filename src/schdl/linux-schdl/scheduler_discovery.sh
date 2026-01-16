@@ -16,3 +16,6 @@ ls
 #lista los archivos
 cat fair.c 
 #muestra el codigo completo del scheduler
+
+#Por que linux no implementa directamente FCFS, SJF o RR como se ven en los libros?
+#Los algoritmos  porque no pueden cargar bien en el sistema
