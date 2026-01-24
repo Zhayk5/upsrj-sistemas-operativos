@@ -1,39 +1,55 @@
 #include <stdio.h>
+#include "process.h"
 
-int main() {
+/* ============================================================
+ * Student implementation area
+ * ============================================================ */
+void fcfs_schedule(Process p[], int n)
+{
+    // Ordenar por arrival_time (y por id si hay empate)
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            if (p[j].arrival_time < p[i].arrival_time ||
+               (p[j].arrival_time == p[i].arrival_time && p[j].id < p[i].id)) {
+                Process tmp = p[i];
+                p[i] = p[j];
+                p[j] = tmp;
+            }
+        }
+    }
+
+    int current_time = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (current_time < p[i].arrival_time) {
+            current_time = p[i].arrival_time;
+        }
+
+        p[i].start_time = current_time;
+        p[i].waiting_time = current_time - p[i].arrival_time;
+        p[i].turnaround_time = p[i].waiting_time + p[i].burst_time;
+
+        current_time += p[i].burst_time;
+    }
+}
+
+/* ============================================================
+ * DO NOT MODIFY MAIN
+ * ============================================================ */
+#ifndef UNIT_TEST
+int main(void)
+{
     int n;
-    int bt[10], wt[10], tat[10];
-    int total_wt = 0, total_tat = 0;
-
-    printf("Numero de procesos: ");
+    printf("Número de procesos: ");
     scanf("%d", &n);
 
-    for(int i = 0; i < n; i++) {
-        printf("Tiempo de ejecucion del proceso %d: ", i+1);
-        scanf("%d", &bt[i]);
-    }
+    Process p[n];
+    read_processes(p, n);
+    init_processes(p, n);
 
-    wt[0] = 0;
+    fcfs_schedule(p, n);
 
-    for(int i = 1; i < n; i++) {
-        wt[i] = bt[i-1] + wt[i-1];
-    }
-
-    for(int i = 0; i < n; i++) {
-        tat[i] = bt[i] + wt[i];
-        total_wt += wt[i];
-        total_tat += tat[i];
-    }
-
-    printf("\nProceso\tBT\tWT\tTAT\n");
-    for(int i = 0; i < n; i++) {
-        printf("%d\t%d\t%d\t%d\n", i+1, bt[i], wt[i], tat[i]);
-    }
-
-    printf("\nTiempo promedio de espera = %.2f",
-           (float)total_wt / n);
-    printf("\nTiempo promedio de retorno = %.2f\n",
-           (float)total_tat / n);
-
+    print_results(p, n, "FCFS Scheduling");
     return 0;
 }
+#endif
