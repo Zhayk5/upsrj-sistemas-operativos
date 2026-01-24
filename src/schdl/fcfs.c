@@ -6,11 +6,13 @@
  * ============================================================ */
 void fcfs_schedule(Process p[], int n)
 {
-    // Ordenar por arrival_time (y por id si hay empate)
+    /* Ordenar por arrival_time (y por id si hay empate) */
     for (int i = 0; i < n - 1; i++) {
         for (int j = i + 1; j < n; j++) {
             if (p[j].arrival_time < p[i].arrival_time ||
-               (p[j].arrival_time == p[i].arrival_time && p[j].id < p[i].id)) {
+               (p[j].arrival_time == p[i].arrival_time &&
+                p[j].id < p[i].id)) {
+
                 Process tmp = p[i];
                 p[i] = p[j];
                 p[j] = tmp;
@@ -22,12 +24,12 @@ void fcfs_schedule(Process p[], int n)
 
     for (int i = 0; i < n; i++) {
         if (current_time < p[i].arrival_time) {
-            current_time = p[i].arrival_time;
+            current_time = p[i].arrival_time; // CPU idle
         }
 
-        p[i].start_time = current_time;
         p[i].waiting_time = current_time - p[i].arrival_time;
-        p[i].turnaround_time = p[i].waiting_time + p[i].burst_time;
+        p[i].turnaround_time =
+            p[i].waiting_time + p[i].burst_time;
 
         current_time += p[i].burst_time;
     }

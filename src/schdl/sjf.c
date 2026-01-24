@@ -8,15 +8,18 @@
 void sjf_schedule(Process p[], int n)
 {
     int current_time = 0;
-    int completed = 0;
+    int completed_count = 0;
 
-    while (completed < n) {
+    Process result[n];   // para guardar el orden de ejecución
+    int res_idx = 0;
+
+    while (completed_count < n) {
         int idx = -1;
         int min_burst = INT_MAX;
 
-        /* Buscar el proceso disponible con menor burst time */
+        // Buscar proceso disponible con menor burst_time
         for (int i = 0; i < n; i++) {
-            if (!p[i].finished &&
+            if (!p[i].completed &&
                 p[i].arrival_time <= current_time &&
                 p[i].burst_time < min_burst) {
 
@@ -25,20 +28,29 @@ void sjf_schedule(Process p[], int n)
             }
         }
 
-        /* Si no hay proceso disponible, la CPU queda ociosa */
+        // CPU ociosa
         if (idx == -1) {
             current_time++;
             continue;
         }
 
-        /* Calcular tiempos */
+        // Calcular tiempos
         p[idx].waiting_time = current_time - p[idx].arrival_time;
-        current_time += p[idx].burst_time;
         p[idx].turnaround_time = p[idx].waiting_time + p[idx].burst_time;
 
-        /* Marcar como terminado */
-        p[idx].finished = 1;
-        completed++;
+        current_time += p[idx].burst_time;
+
+        // Marcar como completado
+        p[idx].completed = 1;
+
+        // Guardar en orden de ejecución
+        result[res_idx++] = p[idx];
+        completed_count++;
+    }
+
+    // Copiar el orden correcto de regreso a p[]
+    for (int i = 0; i < n; i++) {
+        p[i] = result[i];
     }
 }
 
